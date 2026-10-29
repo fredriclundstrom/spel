@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Flygbygget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f2430;--sky:#7cc4f2;--accent:#e4572e;--card:#fffdf7}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#2b2d33;color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+#c{display:block;position:fixed;inset:0;width:100%;height:100%}
+h1,h2,.big{font-family:Fredoka,system-ui,sans-serif}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;z-index:10;
+  background:linear-gradient(#5fb2ea,#bfe3f7 70%,#d9efc4)}
+.overlay.dim{background:rgba(20,24,32,.55)}
+.hidden{display:none!important}
+.card{background:var(--card);border-radius:20px;padding:24px;width:100%;max-width:440px;box-shadow:0 12px 40px rgba(0,0,0,.18);margin:auto}
+h1{margin:0;font-size:42px;line-height:1;color:var(--accent)}
+h2{margin:0 0 8px;font-size:26px}
+.sub{margin:6px 0 18px;color:#555}
+label{display:block;font-weight:600;margin-bottom:12px}
+input{display:block;width:100%;margin-top:4px;padding:12px;border:2px solid #ddd;border-radius:12px;font:inherit;font-size:17px;-webkit-user-select:text;user-select:text}
+input:focus{outline:none;border-color:var(--sky)}
+#code{text-transform:uppercase;letter-spacing:.3em;font-weight:700;text-align:center}
+button{font:inherit;font-weight:700;font-size:17px;border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:#fff;cursor:pointer;width:100%}
+button.sec{background:#2e86de}
+button.ghost{background:#eee;color:var(--ink)}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;align-items:stretch}.row input{margin:0}.row button{width:auto;white-space:nowrap}
+.or{text-align:center;color:#888;margin:14px 0 8px;font-size:13px}
+.err{color:#c0392b;min-height:1.4em;margin:10px 0 0;font-weight:600}
+details{margin-top:14px;font-size:14px;color:#444}summary{cursor:pointer;font-weight:600}
+ol{padding-left:20px;margin:8px 0}
+.codebox{font-family:Fredoka,sans-serif;font-size:52px;letter-spacing:.15em;text-align:center;color:var(--accent);line-height:1.1}
+.link{font-size:13px;word-break:break-all;background:#f1efe8;padding:8px 10px;border-radius:10px;margin:6px 0 10px}
+.players{list-style:none;padding:0;margin:12px 0}
+.players li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f4f2ec;margin-bottom:6px;font-weight:600}
+.dot{width:16px;height:16px;border-radius:50%;flex:none}
+.muted{color:#777;font-size:14px}
+.btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+#hud{position:fixed;left:12px;top:12px;z-index:5;color:#fff;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6);pointer-events:none;max-width:calc(100% - 140px)}
+#hud .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+#hud .chip{font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.35);text-shadow:none}
+#hud .chip.ok{background:#3fa34d}
+#bar{width:200px;height:12px;background:rgba(0,0,0,.4);border-radius:6px;margin-top:6px;overflow:hidden}
+#bar i{display:block;height:100%;background:#f2b134;width:0}
+#toasts{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(92vw,460px)}
+.toast{background:rgba(20,24,32,.85);color:#fff;padding:8px 14px;border-radius:12px;font-weight:600;text-align:center;transition:opacity .4s}
+#hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;background:rgba(20,24,32,.75);color:#fff;padding:8px 16px;border-radius:99px;font-weight:600;text-align:center;pointer-events:none;max-width:calc(100% - 32px)}
+#hint:empty{display:none}
+#touch{position:fixed;inset:0;z-index:4}
+#stick{position:fixed;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.35);display:none;pointer-events:none}
+#knob{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.6)}
+#actbtn{position:fixed;right:22px;bottom:70px;width:92px;height:92px;border-radius:50%;padding:0;font-size:15px;background:rgba(228,87,46,.9);box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#hint.touch{bottom:178px}
+.res{list-style:none;padding:0;margin:10px 0}
+.res li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f4f2ec;margin-bottom:6px}
+.res .pos{font-family:Fredoka,sans-serif;font-size:22px;width:28px;text-align:center}
+.res .nm{font-weight:700}.res .st{font-size:13px;color:#666}
+#map{display:block;margin:6px auto;width:240px;height:240px;border-radius:50%}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<div id="hint"></div>
+<div id="toasts"></div>
+<div id="touch" class="hidden"><div id="stick"><div id="knob"></div></div><button id="actbtn">Gör!</button></div>
+
+<div id="menu" class="overlay">
+  <div class="card">
+    <h1>Flygbygget</h1>
+    <p class="sub">Bygg planet tillsammans. Lyft. Hoppa. Landa närmast mitten.</p>
+    <label>Ditt namn<input id="name" maxlength="12" autocomplete="off"></label>
+    <button id="create">Skapa nytt spel</button>
+    <div class="or">eller gå med i ett spel</div>
+    <div class="row"><input id="code" maxlength="4" placeholder="KOD" autocomplete="off"><button id="join" class="sec">Gå med</button></div>
+    <p id="menuerr" class="err"></p>
+    <details><summary>Så spelar du</summary>
+      <ol>
+        <li>Öppna lådorna i hangaren och hitta flygplansdelarna. Akta er för skräpet.</li>
+        <li>Bär delarna till ritningen i mitten. Ordningen spelar roll!</li>
+        <li>En låda är låst. Nyckeln ligger i någon annan låda.</li>
+        <li>Kliv in genom dörren och veva igång motorn tillsammans.</li>
+        <li>Hoppa ut när du tror att vinden bär dig till tavlan. Dra fallskärmen i tid: under 100 m blir det hård landning.</li>
+      </ol>
+      <p class="muted">Gå med piltangenterna eller WASD. Mellanslag gör saker. På mobilen: dra med tummen och tryck på knappen.</p>
+    </details>
+  </div>
+</div>
+
+<div id="lobby" class="overlay hidden">
+  <div class="card">
+    <p class="muted" style="margin:0;text-align:center">Spelkod</p>
+    <div class="codebox" id="lcode">----</div>
+    <div class="link" id="llink"></div>
+    <div class="row"><button id="copy" class="ghost">Kopiera länk</button><button id="share" class="ghost">Dela</button></div>
+    <ul class="players" id="lplayers"></ul>
+    <p class="muted" id="lwait"></p>
+    <div class="btns"><button id="start">Starta spelet</button></div>
+  </div>
+</div>
+
+<div id="results" class="overlay dim hidden">
+  <div class="card">
+    <h2>Resultat</h2>
+    <p class="muted" id="rinfo"></p>
+    <canvas id="map" width="480" height="480"></canvas>
+    <ol class="res" id="rlist"></ol>
+    <p class="muted" id="rwait"></p>
+    <div class="btns"><button id="again">Spela igen</button><button id="leave" class="ghost">Lämna spelet</button></div>
+  </div>
+</div>
+
+<div id="gone" class="overlay dim hidden">
+  <div class="card" style="text-align:center">
+    <h2>Anslutningen bröts</h2>
+    <p class="muted" id="gonetxt">Värden lämnade spelet.</p>
+    <button id="reload">Till startsidan</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="spel.js"></script>
+</body>
+</html>
